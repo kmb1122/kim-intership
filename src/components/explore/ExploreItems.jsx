@@ -6,28 +6,32 @@ import nftImage from "../../images/nftImage.jpg";
 
 const ExploreItems = () => {
   const [items, setItems] = useState([]);
-  const [sortedItems, setSortedItems] = useState([]);
   const [visibleCount, setVisibleCount] = useState(8);
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
 
-  // Fetch API
+  // Fetch API (default + filtered)
+  const fetchItems = async (filter = "") => {
+    setLoading(true);
+
+    const baseURL =
+      "https://us-central1-nft-cloud-functions.cloudfunctions.net/explore";
+
+    const url = filter ? `${baseURL}?filter=${filter}` : baseURL;
+
+    try {
+      const { data } = await axios.get(url);
+      setItems(data);
+      setVisibleCount(8); // reset visible items
+    } catch (error) {
+      console.error("Error fetching explore items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const { data } = await axios.get(
-          "https://us-central1-nft-cloud-functions.cloudfunctions.net/explore"
-        );
-
-        setItems(data);        // original order
-        setSortedItems(data);  // sorted view
-      } catch (error) {
-        console.error("Error fetching explore items:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchItems();
   }, []);
 
@@ -36,11 +40,18 @@ const ExploreItems = () => {
     const interval = setInterval(() => {
       setTick((t) => t + 1);
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
-  // Countdown formatter
+  // Dropdown handler → fetch new API
+  const handleFilterChange = (value) => {
+    fetchItems(value);
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 4);
+  };
+
   const renderCountdown = (expiryDate) => {
     if (!expiryDate) return null;
 
@@ -55,36 +66,6 @@ const ExploreItems = () => {
     return `${hours}h ${minutes}m ${seconds}s`;
   };
 
-  // Sorting logic
-  const handleSort = (value) => {
-    let sorted = [...items];
-
-    switch (value) {
-      case "price_low_to_high":
-        sorted.sort((a, b) => a.price - b.price);
-        break;
-
-      case "price_high_to_low":
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-
-      case "likes_high_to_low":
-        sorted.sort((a, b) => b.likes - a.likes);
-        break;
-
-      default:
-        sorted = [...items]; // reset to original API order
-        break;
-    }
-
-    setSortedItems(sorted);
-    setVisibleCount(8); // reset visible count on sort
-  };
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + 4);
-  };
-
   return (
     <>
       {/* FILTER DROPDOWN */}
@@ -92,7 +73,7 @@ const ExploreItems = () => {
         <select
           id="filter-items"
           defaultValue=""
-          onChange={(e) => handleSort(e.target.value)}
+          onChange={(e) => handleFilterChange(e.target.value)}
         >
           <option value="">Default</option>
           <option value="price_low_to_high">Price, Low to High</option>
@@ -108,15 +89,27 @@ const ExploreItems = () => {
             key={`loading-${index}`}
             className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
           >
-            <div className="skeleton-box nft__item ">
-              
+            <div className="nft__item">
+              <div className="author_list_pp">
+                <div className="skeleton-box" style={{ width: 50, height: 50, borderRadius: "50%" }}></div>
+              </div>
+
+              <div className="nft__item_wrap">
+                <div className="skeleton-box" style={{ width: "100%", height: 300 }}></div>
+              </div>
+
+              <div className="nft__item_info">
+                <div className="skeleton-box" style={{ width: "70%", height: 20 }}></div>
+                <div className="skeleton-box" style={{ width: "40%", height: 18, marginTop: 10 }}></div>
+              </div>
             </div>
           </div>
         ))}
 
+
       {/* REAL ITEMS */}
       {!loading &&
-        sortedItems.slice(0, visibleCount).map((item, index) => (
+        items.slice(0, visibleCount).map((item, index) => (
           <div
             key={index}
             className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
@@ -125,41 +118,16 @@ const ExploreItems = () => {
             <div className="nft__item">
               <div className="author_list_pp">
                 <Link to="/author">
-                  <img
-                    className="lazy"
-                    src={item.authorImage}
-                    alt={item.author}
-                  />
+                  <img className="lazy" src={item.authorImage} alt={item.author} />
                   <i className="fa fa-check"></i>
                 </Link>
               </div>
 
-              {/* COUNTDOWN */}
               {item.expiryDate && (
-                <div className="de_countdown">
-                  {renderCountdown(item.expiryDate)}
-                </div>
+                <div className="de_countdown">{renderCountdown(item.expiryDate)}</div>
               )}
 
               <div className="nft__item_wrap">
-                <div className="nft__item_extra">
-                  <div className="nft__item_buttons">
-                    <button>Buy Now</button>
-                    <div className="nft__item_share">
-                      <h4>Share</h4>
-                      <a href="" target="_blank" rel="noreferrer">
-                        <i className="fa fa-facebook fa-lg"></i>
-                      </a>
-                      <a href="" target="_blank" rel="noreferrer">
-                        <i className="fa fa-twitter fa-lg"></i>
-                      </a>
-                      <a href="">
-                        <i className="fa fa-envelope fa-lg"></i>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
                 <Link to="/item-details">
                   <img
                     src={item.nftImage}
@@ -186,13 +154,9 @@ const ExploreItems = () => {
         ))}
 
       {/* LOAD MORE BUTTON */}
-      {!loading && visibleCount < sortedItems.length && (
+      {!loading && visibleCount < items.length && (
         <div className="col-md-12 text-center">
-          <button
-            onClick={handleLoadMore}
-            id="loadmore"
-            className="btn-main lead"
-          >
+          <button onClick={handleLoadMore} id="loadmore" className="btn-main lead">
             Load more
           </button>
         </div>
