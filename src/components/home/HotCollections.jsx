@@ -66,28 +66,35 @@ const HotCollections = () => {
 
             {/* LOADING SKELETON CAROUSEL */}
             {loading && (
-              <OwlCarousel className="owl-theme" {...carouselOptions}>
-                {new Array(4).fill(0).map((_, index) => (
-                  <div className="item" key={`loading-${index}`}>
-                    <div className="nft_coll">
-                      <div className="nft_wrap">
-                        <div className="skeleton-nft"></div>
-                      </div>
-
-                      <div className="nft_coll_pp">
-                        <div className="skeleton-author"></div>
-                        <i className="fa fa-check"></i>
-                      </div>
-
-                      <div className="nft_coll_info">
-                        <div className="skeleton-title"></div>
-                        <div className="skeleton-code"></div>
-                      </div>
+            <OwlCarousel className="owl-theme" {...carouselOptions}>
+              {new Array(4).fill(0).map((_, index) => (
+                <div className="item" key={`loading-${index}`}>
+                  <div className="nft_coll">
+                    <div className="nft_wrap">
+                      <div className="skeleton-box" 
+                      style={{ width: "100%", height: "250px", borderRadius: "10px" }}
+                      ></div>
                     </div>
+                    <div className="nft_coll_pp">
+                      <div className="skeleton-box" 
+                      style={{width: "50px", height: "50px", borderRadius: "50%"}}
+                      ></div>
+                      <i className="fa fa-check"></i>
+                    </div>
+                    <div className="nft_coll_info">
+                      <div className="skeleton-box"
+                        style={{ width: "70%", height: "20px", marginBottom: "10px" }}
+                      ></div>
+                      <div className="skeleton-box"
+                        style={{ width: "40%", height: "18px" }}
+                      ></div>
+                    </div>
+
                   </div>
-                ))}
-              </OwlCarousel>
-            )}
+                </div>
+              ))}
+            </OwlCarousel>
+          )}
 
             {/* REAL API CARDS CAROUSEL */}
             {!loading && (
