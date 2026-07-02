@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import OwlCarousel from "react-owl-carousel";
 import { Link } from "react-router-dom";
-import AuthorImage from "../../images/author_thumbnail.jpg";
-import nftImage from "../../images/nftImage.jpg";
 
 const HotCollections = () => {
   const [collections, setCollections] = useState([]);
@@ -77,13 +75,8 @@ const HotCollections = () => {
                       ></div>
                     </div>
                     <div className="nft_coll_pp">
-                      <div
-                        className="skeleton-box"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          borderRadius: "50%",
-                        }}
+                      <div className="skeleton-box"
+                        style={{width: "50px", height: "50px", borderRadius: "50%" }}
                       ></div>
                       <i className="fa fa-check"></i>
                     </div>
@@ -97,7 +90,6 @@ const HotCollections = () => {
                         style={{ width: "40%", height: "18px" }}
                       ></div>
                     </div>
-
                   </div>
                 </div>
               ))}
@@ -119,7 +111,6 @@ const HotCollections = () => {
                           />
                         </Link>
                       </div>
-
                       <div className="nft_coll_pp">
                         <Link to="/author">
                           <img
@@ -151,4 +142,3 @@ const HotCollections = () => {
 };
 
 export default HotCollections;
-
