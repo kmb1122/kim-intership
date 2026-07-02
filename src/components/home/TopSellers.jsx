@@ -62,24 +62,24 @@ const TopSellers = () => {
 
               {/* REAL API DATA */}
               {!loading &&
-                sellers.map((seller, index) => (
+                sellers.map((item, index) => (
                   <li key={index}>
                     <div className="author_list_pp">
-                      <Link to={`/author/${seller.authorId}`}>
+                      <Link to={`/author/${item.authorId}`}>
                         <img
                           className="lazy pp-author"
-                          src={seller.authorImage}
-                          alt={seller.authorName}
+                          src={item.authorImage}
+                          alt={item.authorName}
                         />
                         <i className="fa fa-check"></i>
                       </Link>
                     </div>
 
                     <div className="author_list_info">
-                      <Link to={`/author/${seller.authorId}`}>
-                        {seller.authorName}
+                      <Link to={`/author/${item.authorId}`}>
+                        {item.authorName}
                       </Link>
-                      <span>{seller.price} ETH</span>
+                      <span>{item.price} ETH</span>
                     </div>
                   </li>
                 ))}
